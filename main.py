@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+os.environ["STREAMLIT_SERVER_PORT"] = "8501"
 from utils.ai_helper import get_ai_response
 from utils.financial_data import get_stock_data
 from utils.visualization import create_stock_chart
