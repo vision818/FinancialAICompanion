@@ -4,6 +4,17 @@ from utils.ai_helper import get_ai_response
 from utils.financial_data import get_stock_data
 from utils.visualization import create_stock_chart
 from utils.database import init_db, get_db, ChatHistory, StockAnalysis
+from utils.portfolio_viz import (
+    create_portfolio_allocation_chart,
+    create_risk_reward_chart,
+    create_investment_timeline
+)
+from utils.investment_advisor import (
+    get_risk_profile,
+    get_investment_options,
+    create_investment_timeline_data,
+    get_sustainable_investments
+)
 import pandas as pd
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -70,22 +81,11 @@ with st.sidebar:
         except Exception as e:
             st.error(f"Error loading stock data: {str(e)}")
 
-    # Export Options
-    if st.session_state.current_stock is not None:
-        if st.button("Export Data to CSV"):
-            csv = st.session_state.current_stock.to_csv(index=True)
-            st.download_button(
-                label="Download CSV",
-                data=csv,
-                file_name=f"{stock_symbol}_data.csv",
-                mime="text/csv"
-            )
-
 # Main content
 st.title("Financial AI Assistant")
 
 # Tabs for different features
-tab1, tab2 = st.tabs(["AI Chat", "Stock Analysis"])
+tab1, tab2, tab3 = st.tabs(["AI Chat", "Stock Analysis", "Investment Planning"])
 
 with tab1:
     st.header("Ask me anything about finance!")
@@ -132,3 +132,50 @@ with tab2:
         st.dataframe(stats)
     else:
         st.info("Enter a stock symbol in the sidebar to view analysis")
+
+with tab3:
+    st.header("Investment Planning")
+
+    # Investment Profile Input
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        age = st.number_input("Your Age", min_value=18, max_value=100, value=30)
+    with col2:
+        investment_horizon = st.slider("Investment Horizon (years)", 1, 30, 10)
+    with col3:
+        risk_tolerance = st.selectbox("Risk Tolerance", ["low", "medium", "high"])
+
+    # Get and display portfolio allocation
+    allocation = get_risk_profile(age, investment_horizon, risk_tolerance)
+    st.subheader("Suggested Portfolio Allocation")
+    fig_allocation = create_portfolio_allocation_chart(allocation)
+    st.plotly_chart(fig_allocation, use_container_width=True)
+
+    # Display risk vs reward chart
+    st.subheader("Investment Options: Risk vs Reward")
+    risk_reward = get_investment_options()
+    fig_risk = create_risk_reward_chart(risk_reward)
+    st.plotly_chart(fig_risk, use_container_width=True)
+
+    # Investment Timeline
+    st.subheader("Investment Growth Timeline")
+    initial_investment = st.number_input("Initial Investment ($)", min_value=1000, value=10000)
+    timeline_data = create_investment_timeline_data(initial_investment, investment_horizon)
+    fig_timeline = create_investment_timeline(timeline_data)
+    st.plotly_chart(fig_timeline, use_container_width=True)
+
+    # Sustainable Investing
+    st.subheader("Sustainable Investment Options")
+    sustainable_portfolio = get_sustainable_investments()
+    fig_sustainable = create_portfolio_allocation_chart(sustainable_portfolio)
+    st.plotly_chart(fig_sustainable, use_container_width=True)
+
+    # Investment Tips
+    st.markdown("""
+    ### Key Investment Tips:
+    1. **Diversification** is key to reducing risk
+    2. **Start Early** to benefit from compound interest
+    3. **Regular Rebalancing** keeps your portfolio aligned with your goals
+    4. **Stay Informed** but avoid emotional decisions
+    5. **Consider Costs** like fees and taxes
+    """)
