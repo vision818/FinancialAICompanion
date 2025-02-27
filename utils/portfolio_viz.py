@@ -7,11 +7,16 @@ def create_portfolio_allocation_chart(allocations):
     """
     Create a pie chart showing portfolio allocation
     """
+    df = pd.DataFrame({
+        'Category': list(allocations.keys()),
+        'Percentage': list(allocations.values())
+    })
+
     fig = px.pie(
-        values=list(allocations.values()),
-        names=list(allocations.keys()),
-        title="Suggested Portfolio Allocation",
-        hover_data=[f"{v:.1f}%" for v in list(allocations.values())],
+        df,
+        values='Percentage',
+        names='Category',
+        title="Portfolio Allocation",
         color_discrete_sequence=px.colors.qualitative.Set3
     )
     fig.update_traces(textposition='inside', textinfo='percent+label')
@@ -25,53 +30,56 @@ def create_risk_reward_chart(risk_levels):
     """
     Create a scatter plot showing risk vs reward for different investment options
     """
-    fig = go.Figure()
-    
-    # Add investment options
-    for option, details in risk_levels.items():
-        fig.add_trace(go.Scatter(
-            x=[details['risk']],
-            y=[details['return']],
-            mode='markers+text',
-            name=option,
-            text=[option],
-            textposition="top center",
-            marker=dict(size=15),
-        ))
-    
-    fig.update_layout(
+    df = pd.DataFrame([
+        {'Option': k, 'Risk': v['risk'], 'Return': v['return']}
+        for k, v in risk_levels.items()
+    ])
+
+    fig = px.scatter(
+        df,
+        x='Risk',
+        y='Return',
+        text='Option',
         title="Risk vs. Potential Return",
-        xaxis_title="Risk Level",
-        yaxis_title="Potential Return (%)",
+        labels={'Risk': 'Risk Level', 'Return': 'Potential Return (%)'}
+    )
+
+    fig.update_traces(
+        textposition="top center",
+        marker=dict(size=15)
+    )
+
+    fig.update_layout(
         height=400,
         showlegend=False
     )
-    
+
     return fig
 
 def create_investment_timeline(goals):
     """
     Create a timeline visualization for investment goals
     """
-    fig = go.Figure()
-    
-    # Create timeline
-    for goal in goals:
-        fig.add_trace(go.Scatter(
-            x=[goal['year']],
-            y=[goal['amount']],
-            mode='markers+text',
-            name=goal['description'],
-            text=[goal['description']],
-            textposition="top center",
-            marker=dict(size=15)
-        ))
-    
-    fig.update_layout(
-        title="Investment Timeline",
-        xaxis_title="Year",
-        yaxis_title="Target Amount ($)",
-        height=400
+    df = pd.DataFrame(goals)
+
+    fig = px.line(
+        df,
+        x='year',
+        y='amount',
+        text='description',
+        title='Investment Growth Timeline',
+        labels={'year': 'Year', 'amount': 'Target Amount ($)'}
     )
-    
+
+    fig.update_traces(
+        mode='lines+markers+text',
+        textposition="top center",
+        marker=dict(size=15)
+    )
+
+    fig.update_layout(
+        height=400,
+        showlegend=False
+    )
+
     return fig
