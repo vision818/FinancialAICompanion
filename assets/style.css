@@ -1,0 +1,55 @@
+/* Main container styling */
+.main {
+    padding: 2rem;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    padding: 2rem 1rem;
+}
+
+/* Chat input styling */
+.stTextInput > div > div > input {
+    border-radius: 20px;
+}
+
+/* Button styling */
+.stButton > button {
+    border-radius: 20px;
+    background-color: #0068c9;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background-color: #004c96;
+    transform: translateY(-2px);
+}
+
+/* Chart styling */
+.js-plotly-plot {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* DataFrame styling */
+.dataframe {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat message styling */
+.chat-message {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 10px;
+    background-color: #f0f2f6;
+}
+
+/* Loading spinner styling */
+.stSpinner > div {
+    border-color: #0068c9;
+}
