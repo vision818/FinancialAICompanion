@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+sqlalchemy
+contextlib2
+plotly
+google-generativeai
+yfinance
+python-docx
+pathlib
+psycopg2-binary
