@@ -51,17 +51,17 @@ with st.sidebar:
             data = get_stock_data(stock_symbol)
             st.session_state.current_stock = data
 
-            # Save stock data to database
+            # Save stock data to database with proper type conversion
             with get_session() as db:
                 for index, row in data.iterrows():
                     analysis = StockAnalysis(
                         symbol=stock_symbol,
-                        date=index,
-                        open_price=row['Open'],
-                        high_price=row['High'],
-                        low_price=row['Low'],
-                        close_price=row['Close'],
-                        volume=row['Volume']
+                        date=index.to_pydatetime(),
+                        open_price=float(row['Open']),
+                        high_price=float(row['High']),
+                        low_price=float(row['Low']),
+                        close_price=float(row['Close']),
+                        volume=int(row['Volume'])
                     )
                     db.add(analysis)
                 db.commit()
