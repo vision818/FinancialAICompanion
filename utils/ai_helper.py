@@ -13,16 +13,8 @@ def get_ai_response(query):
     Get response from Gemini AI for financial queries
     """
     try:
-        # List available models
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                model = m.name
-                break
-        else:
-            raise Exception("No suitable Gemini model found")
-
-        # Initialize the model
-        model = genai.GenerativeModel(model)
+        # Initialize the model directly with the latest version
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
         # Add financial context to the prompt
         prompt = f"""As a financial expert AI assistant, please provide a detailed response to the following question:
@@ -46,5 +38,5 @@ def get_ai_response(query):
         if "API_KEY_INVALID" in error_msg:
             raise Exception("Invalid API key. Please check your Google API key configuration.")
         if "models/" in error_msg:
-            raise Exception("Error accessing Gemini model. Please check model availability.")
+            raise Exception("Error accessing Gemini model. Please try again later.")
         raise Exception(f"Error with Gemini AI: {error_msg}")
