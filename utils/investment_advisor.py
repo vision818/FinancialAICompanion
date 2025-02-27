@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import Dict, List, Any
+from utils.fund_analyzer import get_recommended_funds
 
 def get_risk_profile(age: int, investment_horizon: int, risk_tolerance: str) -> Dict[str, float]:
     """

@@ -13,7 +13,8 @@ from utils.investment_advisor import (
     get_risk_profile,
     get_investment_options,
     create_investment_timeline_data,
-    get_sustainable_investments
+    get_sustainable_investments,
+    get_recommended_funds # Added function
 )
 import pandas as pd
 from datetime import datetime
@@ -151,6 +152,12 @@ with tab3:
     fig_allocation = create_portfolio_allocation_chart(allocation)
     st.plotly_chart(fig_allocation, use_container_width=True)
 
+    # Fund Recommendations
+    st.subheader("Recommended Funds")
+    recommended_funds = get_recommended_funds(risk_tolerance)
+    for fund in recommended_funds:
+        st.markdown(f"• {fund}")
+
     # Display risk vs reward chart
     st.subheader("Investment Options: Risk vs Reward")
     risk_reward = get_investment_options()
@@ -170,12 +177,31 @@ with tab3:
     fig_sustainable = create_portfolio_allocation_chart(sustainable_portfolio)
     st.plotly_chart(fig_sustainable, use_container_width=True)
 
-    # Investment Tips
+    # More detailed investment tips
     st.markdown("""
     ### Key Investment Tips:
     1. **Diversification** is key to reducing risk
+       - Spread investments across different asset classes
+       - Consider geographic diversification
+       - Mix different investment styles
+
     2. **Start Early** to benefit from compound interest
+       - Time in the market beats timing the market
+       - Regular contributions add up significantly
+       - Reinvest dividends and gains
+
     3. **Regular Rebalancing** keeps your portfolio aligned with your goals
+       - Review portfolio quarterly
+       - Adjust allocations as needed
+       - Consider life changes and goals
+
     4. **Stay Informed** but avoid emotional decisions
+       - Follow market trends
+       - Research before investing
+       - Don't panic during market volatility
+
     5. **Consider Costs** like fees and taxes
+       - Compare expense ratios
+       - Understand tax implications
+       - Look for tax-efficient options
     """)
