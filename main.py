@@ -15,7 +15,7 @@ from utils.investment_advisor import (
     get_investment_options,
     create_investment_timeline_data,
     get_sustainable_investments,
-    get_recommended_funds # Added function
+    get_recommended_funds
 )
 import pandas as pd
 from datetime import datetime
@@ -34,11 +34,12 @@ def get_session():
     finally:
         db.close()
 
-# Page configuration
+# Streamlit page config
 st.set_page_config(
     page_title="Financial AI Assistant",
     page_icon="💰",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # Initialize session state
@@ -47,7 +48,7 @@ if 'chat_history' not in st.session_state:
 if 'current_stock' not in st.session_state:
     st.session_state.current_stock = None
 
-# Custom CSS
+# Load custom CSS
 with open('assets/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -56,9 +57,42 @@ with st.sidebar:
     st.title("💰 Financial Assistant")
     st.markdown("---")
 
-    # Stock Analysis Section
-    st.subheader("Stock Analysis")
-    stock_symbol = st.text_input("Enter Stock Symbol (e.g., AAPL)")
+    # AI Chat in sidebar
+    st.subheader("💬 AI Chat")
+    user_input = st.text_input("Ask me anything about finance:")
+    if st.button("Ask"):
+        with st.spinner("Thinking..."):
+            try:
+                response = get_ai_response(user_input)
+
+                # Save chat to database
+                with get_session() as db:
+                    chat = ChatHistory(question=user_input, answer=response)
+                    db.add(chat)
+                    db.commit()
+
+                st.session_state.chat_history.append({"question": user_input, "answer": response})
+            except Exception as e:
+                st.error(f"Error getting AI response: {str(e)}")
+
+    # Display chat history from database
+    with get_session() as db:
+        chats = db.query(ChatHistory).order_by(ChatHistory.timestamp.desc()).limit(5).all()
+        for chat in chats:
+            st.markdown("---")
+            st.markdown("**You:** " + chat.question)
+            st.markdown("**AI:** " + chat.answer)
+
+# Main content
+st.title("Financial AI Assistant")
+
+# Tabs for different features
+tab1, tab2 = st.tabs(["Stock Analysis", "Investment Planning"])
+
+with tab1:
+    st.header("📈 Stock Analysis")
+
+    stock_symbol = st.text_input("Enter Stock Symbol (e.g., AAPL)", key="stock_input_main")
     if stock_symbol:
         try:
             data = get_stock_data(stock_symbol)
@@ -83,46 +117,6 @@ with st.sidebar:
         except Exception as e:
             st.error(f"Error loading stock data: {str(e)}")
 
-# Main content
-st.title("Financial AI Assistant")
-
-# Tabs for different features
-tab1, tab2, tab3 = st.tabs(["AI Chat", "Stock Analysis", "Investment Planning"])
-
-with tab1:
-    st.header("Ask me anything about finance!")
-
-    # Chat interface
-    user_input = st.text_input("Your question:", key="user_input")
-    if st.button("Ask"):
-        with st.spinner("Thinking..."):
-            try:
-                response = get_ai_response(user_input)
-
-                # Save chat to database
-                with get_session() as db:
-                    chat = ChatHistory(
-                        question=user_input,
-                        answer=response
-                    )
-                    db.add(chat)
-                    db.commit()
-
-                st.session_state.chat_history.append({"question": user_input, "answer": response})
-            except Exception as e:
-                st.error(f"Error getting AI response: {str(e)}")
-
-    # Display chat history from database
-    with get_session() as db:
-        chats = db.query(ChatHistory).order_by(ChatHistory.timestamp.desc()).limit(10).all()
-        for chat in chats:
-            st.markdown("---")
-            st.markdown("**You:** " + chat.question)
-            st.markdown("**AI:** " + chat.answer)
-
-with tab2:
-    st.header("Stock Analysis")
-
     if st.session_state.current_stock is not None:
         # Display stock chart
         fig = create_stock_chart(st.session_state.current_stock)
@@ -133,10 +127,10 @@ with tab2:
         stats = st.session_state.current_stock.describe()
         st.dataframe(stats)
     else:
-        st.info("Enter a stock symbol in the sidebar to view analysis")
+        st.info("Enter a stock symbol to view analysis.")
 
-with tab3:
-    st.header("Investment Planning")
+with tab2:
+    st.header("📊 Investment Planning")
 
     # Investment Profile Input
     col1, col2, col3 = st.columns(3)
@@ -181,28 +175,29 @@ with tab3:
     # More detailed investment tips
     st.markdown("""
     ### Key Investment Tips:
-    1. **Diversification** is key to reducing risk
-       - Spread investments across different asset classes
-       - Consider geographic diversification
-       - Mix different investment styles
+    1. **Diversification** is key to reducing risk  
+       - Spread investments across different asset classes  
+       - Consider geographic diversification  
+       - Mix different investment styles  
 
-    2. **Start Early** to benefit from compound interest
-       - Time in the market beats timing the market
-       - Regular contributions add up significantly
-       - Reinvest dividends and gains
+    2. **Start Early** to benefit from compound interest  
+       - Time in the market beats timing the market  
+       - Regular contributions add up significantly  
+       - Reinvest dividends and gains  
 
-    3. **Regular Rebalancing** keeps your portfolio aligned with your goals
-       - Review portfolio quarterly
-       - Adjust allocations as needed
-       - Consider life changes and goals
+    3. **Regular Rebalancing** keeps your portfolio aligned with your goals  
+       - Review portfolio quarterly  
+       - Adjust allocations as needed  
+       - Consider life changes and goals  
 
-    4. **Stay Informed** but avoid emotional decisions
-       - Follow market trends
-       - Research before investing
-       - Don't panic during market volatility
+    4. **Stay Informed** but avoid emotional decisions  
+       - Follow market trends  
+       - Research before investing  
+       - Don't panic during market volatility  
 
-    5. **Consider Costs** like fees and taxes
-       - Compare expense ratios
-       - Understand tax implications
-       - Look for tax-efficient options
+    5. **Consider Costs** like fees and taxes  
+       - Compare expense ratios  
+       - Understand tax implications  
+       - Look for tax-efficient options  
     """)
+
