@@ -1,15 +1,21 @@
 /* Main container styling */
 .main {
     padding: 2rem;
-    background-color: #FBFBF9; /* Light background black - 0B1620 */
-
+    background-color: #FBFBF9; /* Light background (Black - #0B1620 can be used if preferred) */
+    flex-grow: 1;
+    overflow-y: auto;  /* Allow scrolling if needed */
 }
 
-/* Sidebar styling */
+/* Sidebar (Left Panel) Styling */
 .css-1d391kg {
+    width: 350px !important;  /* Ensures the sidebar is wide enough */
     padding: 2rem 1rem;
     background-color: #2DBC85; /* Capiwise green */
     color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures input box stays at the bottom */
+    height: 100vh; /* Full height */
 }
 
 /* Chat input styling */
@@ -18,6 +24,14 @@
     border: 1px solid #2DBC85;
     background-color: #FBFBF9;
     color: #333;
+    padding: 10px;
+    width: 100%;  /* Ensures full width */
+}
+
+/* Ensure chat input box is at the bottom of the sidebar */
+.sidebar-chat-container {
+    margin-top: auto;
+    padding-bottom: 10px;
 }
 
 /* Button styling */

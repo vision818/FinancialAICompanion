@@ -40,6 +40,32 @@ class StockAnalysis(Base):
             "volume": self.volume
         }
 
+class PortfolioAnalysis(Base):
+    __tablename__ = "portfolio_analysis"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    portfolio_type = Column(String, nullable=False)
+    date = Column(DateTime, nullable=False)
+    portfolio_value = Column(Float, nullable=False)  # Total value of the portfolio
+    risk_score = Column(Float)  # Risk score of the portfolio
+    return_on_investment = Column(Float)  # ROI for the portfolio
+    
+    # Assuming a portfolio contains multiple stocks or assets
+    # If you wish to track individual asset values, you could either
+    # create separate columns for each asset or use a relationship 
+    # with another table for asset breakdown
+    asset_allocation = Column(Text)  # JSON or string representation of asset allocation
+
+    def to_dict(self):
+        return {
+            "portfolio_type": self.portfolio_type,
+            "date": self.date,
+            "portfolio_value": self.portfolio_value,
+            "risk_score": self.risk_score,
+            "return_on_investment": self.return_on_investment,
+            "asset_allocation": self.asset_allocation
+        }
+
 # Create database tables
 def init_db():
     Base.metadata.create_all(bind=engine)
